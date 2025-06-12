@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Random Number Guessing Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+    input, button {
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+    }
+    button:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+    #giveUpBtn {
+      background-color: #ef4444;
+      margin-top: 10px;
+    }
+    p.error {
+      color: red;
+      margin: 5px 0 0 0;
+      font-size: 14px;
+    }
+    #feedback {
+      margin-top: 20px;
+      min-height: 24px;
+      font-weight: bold;
+    }
+    #guessCountDisplay {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Random Number Guessing Game</h1>
+
+  <label for="maxNumberInput">Enter the max number:</label>
+  <input type="number" id="maxNumberInput" min="1" placeholder="e.g., 100" />
+  <p id="maxError" class="error"></p>
+
+  <button id="startBtn">Start Game</button>
+
+  <div id="game" style="display:none; margin-top:20px;">
+    <p>Guess the number between <span id="maxDisplay"></span></p>
+    <input type="number" id="guessInput" placeholder="Enter your guess" disabled />
+    <button id="guessBtn" disabled>Guess</button>
+    <button id="giveUpBtn" style="display:none;">Give Up</button>
+    <p id="feedback"></p>
+    <p id="guessCountDisplay">Guesses taken: <span id="guessCount">0</span></p>
+    <button id="restartBtn" style="margin-top: 20px;">Restart Game</button>
+  </div>
+
+  <script>
+    const maxNumberInput = document.getElementById('maxNumberInput');
+    const maxError = document.getElementById('maxError');
+    const startBtn = document.getElementById('startBtn');
+    const gameDiv = document.getElementById('game');
+    const maxDisplay = document.getElementById('maxDisplay');
+    const guessInput = document.getElementById('guessInput');
+    const guessBtn = document.getElementById('guessBtn');
+    const feedback = document.getElementById('feedback');
+    const guessCountSpan = document.getElementById('guessCount');
+    const guessCountDisplay = document.getElementById('guessCountDisplay');
+    const giveUpBtn = document.getElementById('giveUpBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
+    let maxNumber;
+    let randomNumber;
+    let guessCount = 0;
+
+    // Start game handler
+    startBtn.addEventListener('click', () => {
+      maxError.textContent = '';
+      maxNumber = parseInt(maxNumberInput.value);
+      if (isNaN(maxNumber) || maxNumber < 1) {
+        maxError.textContent = 'Please enter a valid positive number for max.';
+        return;
+      }
+      randomNumber = Math.floor(Math.random() * maxNumber) + 1;
+      maxDisplay.textContent = maxNumber;
+      gameDiv.style.display = 'block';
+      feedback.textContent = '';
+      guessInput.value = '';
+      guessInput.disabled = false;
+      guessBtn.disabled = false;
+      guessCount = 0;
+      guessCountSpan.textContent = guessCount;
+      startBtn.disabled = true;
+      maxNumberInput.disabled = true;
+      guessInput.focus();
+      giveUpBtn.style.display = 'inline-block';
+    });
+
+    // Guess button handler
+    guessBtn.addEventListener('click', () => {
+      const guess = parseInt(guessInput.value);
+      if (isNaN(guess)) {
+        feedback.textContent = 'Please enter a valid number!';
+        return;
+      }
+      if (guess < 1 || guess > maxNumber) {
+        feedback.textContent = `Your guess must be between 1 and ${maxNumber}.`;
+        return;
+      }
+      guessCount++;
+      guessCountSpan.textContent = guessCount;
+
+      if (guess === randomNumber) {
+        feedback.textContent = `🎉 Congratulations! You guessed it right in ${guessCount} tries: ${randomNumber}`;
+        guessBtn.disabled = true;
+        guessInput.disabled = true;
+        giveUpBtn.style.display = 'none';
+      } else if (guess < randomNumber) {
+        feedback.textContent = '📉 Too low! Try again.';
+      } else {
+        feedback.textContent = '📈 Too high! Try again.';
+      }
+      guessInput.value = '';
+      guessInput.focus();
+    });
+
+    // Give up button handler
+    giveUpBtn.addEventListener('click', () => {
+      feedback.textContent = `😞 You gave up! The number was ${randomNumber}`;
+      guessBtn.disabled = true;
+      guessInput.disabled = true;
+      giveUpBtn.style.display = 'none';
+    });
+
+    // Restart button handler
+    restartBtn.addEventListener('click', () => {
+      gameDiv.style.display = 'none';
+      startBtn.disabled = false;
+      maxNumberInput.disabled = false;
+      maxNumberInput.value = '';
+      guessInput.value = '';
+      guessInput.disabled = true;
+      guessBtn.disabled = false;
+      feedback.textContent = '';
+      maxError.textContent = '';
+      guessCount = 0;
+      guessCountSpan.textContent = guessCount;
+      giveUpBtn.style.display = 'none';
+      maxNumberInput.focus();
+    });
+
+    // Enter key support for maxNumberInput
+    maxNumberInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        startBtn.click();
+      }
+    });
+
+    // Enter key support for guessInput
+    guessInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        guessBtn.click();
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+
